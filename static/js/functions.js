@@ -4,43 +4,37 @@ function signup_serve() {
 async function signup_form_submit() {
     const email = document.getElementById("email").value.toLowerCase();
     const password = document.getElementById("password").value;
-
+    const username = document.getElementById("username").value;
     const JSON_message = {
-        "email": email,
-        "password": password
+        "email": encodeURIComponent(email),
+        "password": encodeURIComponent(password),
+        "username": encodeURIComponent(username)
     };
 
     const URL_curr = window.location.href;
     const concated = URL_curr.concat("/signup_details");
-    console.log(concated)
     const res = await fetch(concated,{
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(JSON_message)
     });
-    console.log(res)
     const data = await res.json();
     const message = data.message;
-    console.log(message)
-    if (message === "Username")
+    if (message === "username")
         {
-            document.getElementById("error_message").innerHTML += "This username is already taken";
+            document.getElementById("error_message").innerHTML = "This username is already taken";
         }
-    if (message === "Password")
+    if (message === "password")
         {
-            document.getElementById("error_message").innerHTML += "The password is not strong";
+            document.getElementById("error_message").innerHTML = "The password is not strong";
         }
-    if (message === "Allright")
+    if (message === "allright")
         {
-            windows.location.href = "/login";
+            window.location.href = "/login";
         }
     if (message === "email")
         {
-            document.getElementById("error_message").innerHTML += "This email is not valid";
+            document.getElementById("error_message").innerHTML = "This email is not valid";
         }
-    
-    // request.open("POST","/signup_details");
-    // request.setRequestHeader("Content-Type","application/json");
-    // request.send(JSON.stringify(JSON_message));
 }
 
