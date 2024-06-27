@@ -15,11 +15,13 @@ async function signup_form_submit() {
     console.log(concated)
     const res = await fetch(concated,{
         method: "POST",
-        headers: {"Content-Type:": "application/json"},
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(JSON_message)
     });
+    console.log(res)
     const data = await res.json();
     const message = data.message;
+    console.log(message)
     if (message === "Username")
         {
             document.getElementById("error_message").innerHTML += "This username is already taken";
@@ -31,6 +33,10 @@ async function signup_form_submit() {
     if (message === "Allright")
         {
             windows.location.href = "/login";
+        }
+    if (message === "email")
+        {
+            document.getElementById("error_message").innerHTML += "This email is not valid";
         }
     
     // request.open("POST","/signup_details");
