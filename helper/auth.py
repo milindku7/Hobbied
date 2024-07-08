@@ -1,6 +1,19 @@
 import hashlib
 import uuid
 
+def create_file(name,content):
+    with open(name,"wb") as file:
+        file.write(content)
+
+def hasher():
+    new_token = str(uuid.uuid4())
+    new_2_token = hashlib.sha256(new_token.encode("utf-8")).hexdigest()
+    return [new_token,new_2_token]
+
+def existing_hasher(new_token):
+    new_2_token = hashlib.sha256(new_token.encode("utf-8")).hexdigest()
+    return new_2_token
+
 def extract_credentials(password_str):
     password_str = password_str.replace("%21","!")
     password_str = password_str.replace("%40","@")

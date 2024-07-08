@@ -67,17 +67,17 @@ def validate_username(username):
 
 @app.route("/")
 def serve_index():
-    auth_token = request.cookies.get("auth_token")
-    auth_token = auth_token.encode("utf-8")
-    auth_token = hashlib.sha256(auth_token)
-    auth_token = auth_token.hexdigest()
-    found_auth_token = users.find_one({"authtoken": auth_token})
-    if found_auth_token:
-        pass
-    
-    
-        
-    return render_template("index.html")
+    if "auth_token" in request.cookies.keys():
+        auth_token = request.cookies.get("auth_token")
+        auth_token = helper.auth.existing_hasher(auth_token)
+        found_auth_token = users.find_one({"authtoken": auth_token})
+        if found_auth_token:
+            xsrf = str(found_auth_token["XSRF"])
+            return render_template("index.html",XSRF_value=xsrf,Username_status=True,Username=found_auth_token["username"],postsInfo=posts.find())
+        else:
+            return render_template("index.html",Username_status=False,postsInfo=posts.find())
+    else:
+        return render_template("index.html",Username_status=False,postsInfo=posts.find())
 
 @app.route("/signup")
 def serve_signup():
@@ -124,7 +124,7 @@ def after_signup():
 def login_page():
     return render_template("login.html")
 
-@app.route("/login/login_details")
+@app.route("/login/login_details",methods=["POST"])
 def check_login():
     req_json = request.get_json()
     username = req_json["username"]
@@ -137,23 +137,19 @@ def check_login():
         received_pass = helper.auth.modify_pass(received_pass)
         og_pass = found_user["password"]
         if og_pass == received_pass:
-            if found_user["authtoken"] == "":
-                new_token = uuid.uuid4()
-                new_token = str(new_token)
-                new_token = new_token.encode("utf-8")
-                new_token = hashlib.sha256(new_token).hexdigest()
-                users.update_one({"username": username},{"$set" : {"authtoken": new_token}})
-            if found_user["XSRF"] == "":
-                new_xsrf = uuid.uuid4()
-                new_xsrf = str(new_xsrf)
-                users.update_one({"username": username},{"$set" : {"XSRF": new_xsrf}})
-            found_user = users.find_one({"username": username})
-            fin_auth = found_user["authtoken"]
             data = {
-            "message": "notright"
+            "message": "allright"
             }
+            
+            auther = helper.auth.hasher()
+            users.update_one({"username": username},{"$set" : {"authtoken": auther[1]}})
+            
+            new_xsrf = uuid.uuid4()
+            new_xsrf = str(new_xsrf)
+            users.update_one({"username": username},{"$set" : {"XSRF": new_xsrf}})
+            
             response = make_response(jsonify(data))
-            response.set_cookie("auth_token",fin_auth,max_age=31536000,httponly=True,secure=True)
+            response.set_cookie("auth_token",auther[0],max_age=31536000,httponly=True,secure=True)
             response.headers['X-Content-Type-Options'] = 'nosniff'
             return response
     else:
@@ -161,6 +157,34 @@ def check_login():
             "message": "notright"
         }
         return jsonify(data)
+
+@app.route("/new_post",methods=["POST"])
+def create_new_post():
+    req_json = request.get_json()
+    xsrf = req_json["XSRF"]
+    xsrf = helper.auth.extract_credentials(xsrf)
+    xsrf = escape_characters(xsrf)
+    found_user = users.find_one({"XSRF": xsrf})
+    if found_user:
+        auth = request.cookies.get("auth_token")
+        if auth == found_user["authtoken"]:
+            title  = req_json["title"]
+            title = helper.auth.extract_credentials(title)
+            title = escape_characters(title)
+            
+            desc  = req_json["description"]
+            desc = helper.auth.extract_credentials(desc)
+            desc = escape_characters(desc)
+            
+            image_data = req_json["picture"]
+            image_name = str(uuid.uuid4())
+            image_name = "/static/images/" + image_name
+            helper.auth.create_file(image_name,image_data)
+            
+            id = str(uuid.uuid4())
+            
+            posts.insert_one({"title":title,"description":desc,"id":id,"image_src":image_name})
+            return jsonify({"message":"done"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",debug=True,port=8080)

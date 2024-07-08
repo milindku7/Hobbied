@@ -63,3 +63,34 @@ async function login_process() {
             window.location.href = "/";
         }
 }
+function serve_login_page() {
+    window.location.href = "/login";
+}
+async function make_new_post(){
+    const title = document.getElementById("new_post_title");
+    const description = document.getElementById("new_post_description");
+    const picture = document.getElementById("post_picture");
+    const xsrf = document.getElementById("xsrf_token")
+    console.log(typeof picture);
+    if (title == undefined || title === "" || title === null) {
+        document.getElementById("need_title") = "Please provide a title";
+    }
+    if (description == undefined || description === "" || description === null) {
+        document.getElementById("need_desc") = "Please provide a description";
+    }
+    const JSON_message = {
+        "title": title,
+        "description": description,
+        "picture": picture,
+        "XSRF": xsrf
+    };
+    const URL_curr = window.location.href;
+    const concated = URL_curr.concat("/new_post");
+    const res = await fetch(concated,{
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(JSON_message)
+    });
+    const data = await res.json();
+    window.location.href = "/";
+}
