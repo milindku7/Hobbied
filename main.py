@@ -7,6 +7,8 @@ import helper.auth
 import hashlib
 import uuid
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 app = Flask(__name__,template_folder="public")
 
 mongo_client = MongoClient("mongo")
@@ -158,33 +160,49 @@ def check_login():
         }
         return jsonify(data)
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route("/new_post",methods=["POST"])
 def create_new_post():
-    req_json = request.get_json()
-    xsrf = req_json["XSRF"]
+    xsrf = request.form.get("xsrf_token")
+    if xsrf is None or len(xsrf) == 0:
+        return make_response(403,"Forbidden")
     xsrf = helper.auth.extract_credentials(xsrf)
-    xsrf = escape_characters(xsrf)
     found_user = users.find_one({"XSRF": xsrf})
     if found_user:
         auth = request.cookies.get("auth_token")
+        auth = helper.auth.existing_hasher(auth)
         if auth == found_user["authtoken"]:
-            title  = req_json["title"]
+            title  = request.form.get("new_post_title")
+            if title == "":
+                return redirect("/",title_error = True)
             title = helper.auth.extract_credentials(title)
             title = escape_characters(title)
             
-            desc  = req_json["description"]
+            desc  = request.form.get("new_post_description")
+            if desc == "":
+                return redirect("/",desc_error = True)
             desc = helper.auth.extract_credentials(desc)
             desc = escape_characters(desc)
             
-            image_data = req_json["picture"]
-            image_name = str(uuid.uuid4())
-            image_name = "/static/images/" + image_name
-            helper.auth.create_file(image_name,image_data)
+            
+            image_name = ""
+            if 'file' in request.files and request.files['file'].filename != '' and allowed_file(request.files['file'].filename):
+                image_data = request.files['file']
+                image_name = str(uuid.uuid4())
+                image_name = "/static/images/" + image_name + "." + image_data.filename.rsplit('.', 1)[1].lower()
+                image_data.save(image_name)
+            else:
+                return redirect("/",pic_error=True)
             
             id = str(uuid.uuid4())
             
             posts.insert_one({"title":title,"description":desc,"id":id,"image_src":image_name})
-            return jsonify({"message":"done"})
+            return redirect("/")
+        return make_response(403,"Forbidden")
+    return make_response(403,"Forbidden")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",debug=True,port=8080)

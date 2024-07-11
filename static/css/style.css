@@ -97,6 +97,10 @@ textarea {
     background-color: #272a3b;
     color: #eee8f6;
 }
+.w3-quarter {
+    width: 50px;
+    height: 70px;
+}
 #the_close_button {
     border-radius: 10px;
     width: 640px;

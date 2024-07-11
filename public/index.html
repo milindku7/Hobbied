@@ -19,16 +19,24 @@ h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 
 <nav id="new_post_form">
   <br>
-  <a class="spaceadded">&nbsp</a>
-  <p style="color: red;" id="need_title"></p><input type="text" id="new_post_title" placeholder="Post Title"><br><br>
-  <a class="spaceadded">&nbsp</a>
-  <p style="color: red;" id="need_desc"></p><textarea id="new_post_description" placeholder="Post Description"></textarea><br><br>
-  <a style="font-weight: bold;font-size: 20px;padding-left: 25px;">
-    <p style="color: red;" id="need_pic"></p>Attach an Image:&nbsp&nbsp&nbsp</a>
-  <input type="file" id="post_picture"><br><br>
-  <a class="spaceadded">&nbsp</a><button id="the_submit_button" onclick="make_new_post()">Submit</button><br><br>
-  <a class="spaceadded">&nbsp</a><button id="the_close_button" onclick="new_post_form_close()">Close</button>
-  <br>&nbsp&nbsp 
+  <form id="submit_new_post_form" action="/new_post" method="post" enctype="multipart/form-data">
+    <input type='text' value='{{ XSRF_value }}' id='xsrf_token' name="xsrf_token" hidden>
+    {% if title_error %}
+    <p style="color: red;" id="need_title"></p>
+    {% endif %}
+    <input type="text" id="new_post_title" placeholder="Post Title" name="new_post_title">
+    {% if desc_error %}
+    <p style="color: red;" id="need_desc"></p>
+    {% endif %}
+    <textarea id="new_post_description" placeholder="Post Description" name="new_post_description"></textarea>
+    {% if pic_error %}
+    <p style="color: red;" id="need_pic"></p>
+    {% endif %}
+    Attach an Image:
+    <input type="file" id="post_picture" name="file" name="post_picture">
+    <input type="submit" value="Submit" onclick="make_new_post()">
+    <button id="the_close_button" onclick="new_post_form_close()">Close</button>
+  </form> 
 </nav>
 
 <!-- Sidebar (hidden by default) -->
@@ -38,7 +46,7 @@ h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
   <a href="#food" onclick="w3_close()" class="w3-bar-item w3-button">Food</a>
   <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
 </nav>
-<input value='{{ XSRF_value }}' id='xsrf_token' hidden>
+
 <!-- Top menu -->
 <div id="header1">
   <div id="w31">
@@ -62,7 +70,7 @@ h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
   <div class="w3-row-padding w3-padding-16 w3-center">
     {% for postInfo in postsInfo %}
     <div class="w3-quarter">
-      <img src="{{ postInfo.image }}" style="width:100%">
+      <img src="{{ postInfo.image_src }}" style="width:50px;">
       <h3>{{ postInfo.title }}</h3>
       <p>{{ postInfo.description }}</p>
     </div>
@@ -137,6 +145,9 @@ function return_home() {
 }
 
 function new_post_open() {
+  document.getElementById("new_post_title").innerHTML = "";
+  document.getElementById("new_post_description").innerHTML = "";
+  document.getElementById("post_picture").value = "";
   document.getElementById("new_post_form").style.display = "block";
   document.getElementById("new_post").style.display = "none";
 }
