@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>W3.CSS Template</title>
+<title>!!Hobbied!!</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="shortcut icon" type="image/png" href="/static/images/thumbnail.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+<link rel="stylesheet" href="/static/css/style.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -17,34 +18,12 @@ h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 </head>
 <body>
 
-<nav id="new_post_form">
-  <br>
-  <form id="submit_new_post_form" action="/new_post" method="post" enctype="multipart/form-data">
-    <input type='text' value='{{ XSRF_value }}' id='xsrf_token' name="xsrf_token" hidden>
-    {% if title_error %}
-    <p style="color: red;" id="need_title"></p>
-    {% endif %}
-    <input type="text" id="new_post_title" placeholder="Post Title" name="new_post_title">
-    {% if desc_error %}
-    <p style="color: red;" id="need_desc"></p>
-    {% endif %}
-    <textarea id="new_post_description" placeholder="Post Description" name="new_post_description"></textarea>
-    {% if pic_error %}
-    <p style="color: red;" id="need_pic"></p>
-    {% endif %}
-    Attach an Image:
-    <input type="file" id="post_picture" name="file" name="post_picture">
-    <input type="submit" value="Submit" onclick="make_new_post()">
-    <button id="the_close_button" onclick="new_post_form_close()">Close</button>
-  </form> 
-</nav>
-
 <!-- Sidebar (hidden by default) -->
 <nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()"
   class="w3-bar-item w3-button">Close Menu</a>
-  <a href="#food" onclick="w3_close()" class="w3-bar-item w3-button">Food</a>
-  <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">About</a>
+  <a href="#" onclick="w3_close_account()" class="w3-bar-item w3-button">Account Info</a>
+  <a href="#" onclick="w3_close_about()" class="w3-bar-item w3-button">About Hobbied</a>
 </nav>
 
 <!-- Top menu -->
@@ -52,21 +31,26 @@ h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
   <div id="w31">
     <div id="w311" onclick="w3_open()">☰</div>
     <div id="w312">
-      {% if Username_status == False %}
-      <button onclick='serve_login_page()'>Log In</button></div>
-      {% else %}
-      {{Username}}</div>
-      {% endif %}
+      <p id="tl-username">{{Username}}</p></div>
     <div id="w313" onclick="return_home()">Hobbied</div>
-    <div id="new_post" onclick="new_post_open()">&nbsp&nbsp&nbsp&nbspNew Post&nbsp&nbsp&nbsp&nbsp</div>
   </div>
 </div>
-  
+<div style="width: fit-content;" id="contains_search_contents">
+  <input type="text" placeholder="Search...." id="search_bar">
+  <div style="float: inline-end;">
+    <button onclick="search_database()" class="all_buttons" style="margin-top: 0px; position: absolute; margin-left: 20px;">Go!</button></div>
+  </div>
+</div>
+<div id="new_post_container">
+<div id="new_post_div">
+  <button onclick="new_post_navigate()" id="new_post_button" class="all_buttons" style="width: 300px; left: 50%;">Create Something New!</button>
+</div>
+</div>
+
 <!-- !PAGE CONTENT! -->
 <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px;">
 
   <!-- First Photo Grid-->
-  <hr id="food">
   <div class="w3-row-padding w3-padding-16 w3-center">
     {% for postInfo in postsInfo %}
     <div class="w3-quarter">
@@ -140,8 +124,18 @@ function w3_close() {
   document.getElementById("mySidebar").style.display = "none";
 }
 
+function w3_close_account() {
+  document.getElementById("mySidebar").style.display = "none";
+  window.location.href = "/account";
+}
+
+function w3_close_about() {
+  document.getElementById("mySidebar").style.display = "none";
+  window.location.href = "/about";
+}
+
 function return_home() {
-  window.location.href = "/home";
+  window.location.href = "/";
 }
 
 function new_post_open() {

@@ -1,0 +1,38 @@
+
+
+<form id="submit_new_post_form" action="/new_post" method="post" enctype="multipart/form-data">
+    <input type='text' value='{{ XSRF_value }}' id='xsrf_token' name="xsrf_token" hidden>
+    {% if title_error %}
+    <p style="color: red;" id="need_title"></p>
+    {% endif %}
+    <input type="text" id="new_post_title" placeholder="Post Title" name="new_post_title">
+    {% if desc_error %}
+    <p style="color: red;" id="need_desc"></p>
+    {% endif %}
+    <textarea id="new_post_description" placeholder="Post Description" name="new_post_description"></textarea>
+    {% if pic_error %}
+    <p style="color: red;" id="need_pic"></p>
+    {% endif %}
+    Attach an Image:
+    <input type="file" id="post_picture" name="file" name="post_picture">
+    <input type="submit" value="Submit" onclick="make_new_post()">
+    <button id="the_close_button" onclick="new_post_form_close()">Close</button>
+</form>
+
+<div id="header1">
+    <div id="w31">
+      <div id="w311" onclick="w3_open()">☰</div>
+      <div id="w312">
+        {% if Username_status == False %}
+        <p id="tl-username">{{Username}}</p></div>
+        <button onclick='serve_login_page()' class="all_buttons">Log In</button></div>
+        {% else %}
+        <p id="tl-username">{{Username}}</p></div>
+        {% endif %}
+      <div id="w313" onclick="return_home()">Hobbied</div>
+      <div style="width: fit-content;">
+      <input type="text" placeholder="Search.." id="search_bar">
+      <div style="float: inline-end;"><button onclick="search_database()" class="all_buttons">Go!</button></div>
+      </div>
+    </div>
+  </div>

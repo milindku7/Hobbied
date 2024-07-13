@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, make_response
+from flask import Flask, render_template, request, jsonify, redirect, make_response, url_for
 import json
 from pymongo import MongoClient
 import re
@@ -6,6 +6,11 @@ from email_validator import validate_email, EmailNotValidError
 import helper.auth
 import hashlib
 import uuid
+from datetime import date
+
+#{{ url_for('static',filename='css/style.css') }}
+#{{ url_for('static',filename='css/login_style.css') }}
+#widen the login page, account info page, new post page, add trending tab later, fix the length of username
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -75,7 +80,11 @@ def serve_index():
         found_auth_token = users.find_one({"authtoken": auth_token})
         if found_auth_token:
             xsrf = str(found_auth_token["XSRF"])
-            return render_template("index.html",XSRF_value=xsrf,Username_status=True,Username=found_auth_token["username"],postsInfo=posts.find())
+            if len(found_auth_token["username"]) > 10:
+                us = found_auth_token["username"][:10] + ".."
+            else:
+                us = found_auth_token["username"]
+            return render_template("index.html",XSRF_value=xsrf,Username_status=True,Username=us,postsInfo=posts.find())
         else:
             return render_template("index.html",Username_status=False,postsInfo=posts.find())
     else:
@@ -110,13 +119,16 @@ def after_signup():
     username = helper.auth.extract_credentials(req_json["username"])
     username_result = validate_username(username)
     
-    if username_result is False:
+    if username_result is False or len(username) > 20:
         data = {
         "message": "username"
         }
         return jsonify(data)
     
-    users.insert_one({"username": username, "password": password, "authtoken": "", "XSRF": ""})
+    today = date.today()
+    today = str(today.strftime("%B %d, %Y"))
+    
+    users.insert_one({"username": username, "password": password, "authtoken": "", "XSRF": "", "created": today})
     data = {
         "message": "allright"
     }
@@ -177,13 +189,13 @@ def create_new_post():
         if auth == found_user["authtoken"]:
             title  = request.form.get("new_post_title")
             if title == "":
-                return redirect("/",title_error = True)
+                return make_response(redirect(url_for('index', title_error=True)))
             title = helper.auth.extract_credentials(title)
             title = escape_characters(title)
             
             desc  = request.form.get("new_post_description")
             if desc == "":
-                return redirect("/",desc_error = True)
+                return make_response(redirect("/"),desc_error=True)
             desc = helper.auth.extract_credentials(desc)
             desc = escape_characters(desc)
             
@@ -195,12 +207,12 @@ def create_new_post():
                 image_name = "/static/images/" + image_name + "." + image_data.filename.rsplit('.', 1)[1].lower()
                 image_data.save(image_name)
             else:
-                return redirect("/",pic_error=True)
+                return make_response(redirect("/"),pic_error=True)
             
             id = str(uuid.uuid4())
             
-            posts.insert_one({"title":title,"description":desc,"id":id,"image_src":image_name})
-            return redirect("/")
+            posts.insert_one({"title":title,"description":desc,"id":id,"image_src":image_name,"likes":0,"dislikes":0})
+            return make_response(redirect("/"))
         return make_response(403,"Forbidden")
     return make_response(403,"Forbidden")
 

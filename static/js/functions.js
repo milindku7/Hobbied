@@ -22,7 +22,7 @@ async function signup_form_submit() {
     const message = data.message;
     if (message === "username")
         {
-            document.getElementById("error_message").innerHTML = "This username is already taken";
+            document.getElementById("error_message").innerHTML = "This username is already taken or is more than 20 characters";
         }
     if (message === "password")
         {
