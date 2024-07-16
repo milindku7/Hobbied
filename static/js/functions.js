@@ -69,3 +69,54 @@ function serve_login_page() {
 function make_new_post(){
     document.getElementById("new_post_form").style.display = "none";
 }
+function new_post_form_close() {
+    window.location.href = "/";
+  }
+
+function toggleColor(button_id) {
+    const button = document.getElementById(button_id);
+
+    if (document.getElementById("tags_pressed").value !== "") {
+        let split_string = document.getElementById("tags_pressed").value.split(",");
+        let split_string2 = [];
+
+        for (let i of split_string) {
+            if (i === button_id) {
+                button.style.backgroundColor = '#272a3b';
+                button.style.color = 'white';
+                for (let k of split_string) {
+                    if (k !== button_id) {
+                        split_string2.push(k);
+                    }
+                }
+                let final_str = "";
+                for (let acc of split_string2) {
+                    if (final_str === "") {
+                        final_str = acc;
+                    }
+                    else {
+                        final_str = final_str.concat(",");
+                        final_str = final_str.concat(acc);
+                    }
+                }
+                document.getElementById("tags_pressed").value = final_str;
+                return;
+            }
+        }
+
+    }
+
+    if (document.getElementById("tags_pressed").value === "") {
+        document.getElementById("tags_pressed").value += button_id;
+    }
+    else {
+        let t = ","
+        document.getElementById("tags_pressed").value += t.concat(button_id);
+    }
+    console.log(document.getElementById("tags_pressed").value)
+    button.style.backgroundColor = 'red';
+    button.style.color = 'white';
+}
+function custom_tag() {
+    
+}

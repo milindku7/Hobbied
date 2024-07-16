@@ -111,10 +111,10 @@ textarea {
     background-color: #272a3b;
     color: #eee8f6;
 }
-button:hover {
+.all_buttons:hover {
     background-color: #272a3b;
 }
-button:active {
+.all_buttons:active {
     transform: translateY(2px);
     box-shadow: 0px 2px 0px 0px rgb(67, 88, 93);
 }
@@ -171,4 +171,34 @@ button:active {
 #new_post_container {
     position: relative;
     padding-top: 30px;
+}
+
+#style_new_post {
+    margin-left: 30%;
+}
+#submit_form {
+    border-radius: 10px;
+    width: 640px;
+    height: 40px;
+    font-weight: bold;
+    font-size: 23px;
+    font-family: "Exo 2", sans-serif;
+    background-color: #272a3b;
+    color: #eee8f6;
+    
+}
+.tag_container {
+    float: left;
+    justify-content: left;
+    padding-left: 20px;
+    width: 25%;
+}
+.toggle-button {
+    background-color: #272a3b;
+    box-shadow: 0px 3px 0px 0px rgb(77, 115, 138);
+}
+.toggle-button:active {
+    background-color: red;
+    transform: translateY(2px);
+    box-shadow: 0px 2px 0px 0px rgb(67, 88, 93);
 }

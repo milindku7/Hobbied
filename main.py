@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, make_response, url_for
+from flask import Flask, render_template, request, jsonify, redirect, make_response, url_for, send_from_directory
 import json
 from pymongo import MongoClient
 import re
@@ -11,6 +11,7 @@ from datetime import date
 #{{ url_for('static',filename='css/style.css') }}
 #{{ url_for('static',filename='css/login_style.css') }}
 #widen the login page, account info page, new post page, add trending tab later, fix the length of username
+#dont alloww , in tags, send tags in a list while getting post.html, ids of every tag neds to be accomplished, replace the space with _
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -176,8 +177,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route("/new_post",methods=["POST"])
+@app.route("/new_post",methods=["GET","POST"])
 def create_new_post():
+    if request.method == "GET":
+        return render_template("post.html")
     xsrf = request.form.get("xsrf_token")
     if xsrf is None or len(xsrf) == 0:
         return make_response(403,"Forbidden")
@@ -215,6 +218,18 @@ def create_new_post():
             return make_response(redirect("/"))
         return make_response(403,"Forbidden")
     return make_response(403,"Forbidden")
+
+@app.route("/about")
+def display_about():
+    return render_template("about.html")
+
+@app.route("/account")
+def display_account():
+    return render_template("account.html")
+
+@app.route("/static/images/<filename>")
+def send_pic(filename):
+    return send_from_directory('static/images',filename)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",debug=True,port=8080)

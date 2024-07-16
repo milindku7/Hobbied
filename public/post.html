@@ -1,38 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hobbied!!</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="shortcut icon" type="image/png" href="/static/images/thumbnail.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {background-color: #ffffff;font-family: "Karma", sans-serif;}
+h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
+.w3-bar-block .w3-bar-item {padding:20px}
+</style>
+</head>
+<body>
 
+<!-- Sidebar (hidden by default) -->
+<nav class="w3-sidebar w3-bar-block w3-card w3-top w3-xlarge w3-animate-left" style="display:none;z-index:2;width:40%;min-width:300px" id="mySidebar">
+  <a href="javascript:void(0)" onclick="w3_close()"
+  class="w3-bar-item w3-button">Close Menu</a>
+  <a href="#" onclick="w3_close_account()" class="w3-bar-item w3-button">Account Info</a>
+  <a href="#" onclick="w3_close_about()" class="w3-bar-item w3-button">About Hobbied</a>
+  <a href="#" onclick="logout_acc()" class="w3-bar-item w3-button">Logout</a>
+</nav>
 
+<!-- Top menu -->
+<div id="header1">
+  <div id="w31">
+    <div id="w311" onclick="w3_open()">☰</div>
+    <div id="w312">
+      <p id="tl-username">{{Username}}</p></div>
+    <div id="w313" onclick="return_home()">Hobbied</div>
+  </div>
+</div>
+<div class="tag_container">
+    <h3>POPULAR TAGS</h3>
+    <p>
+      {% for tags in popular_tags.keys() %}
+      <button class="w3-tag w3-round-medium w3-large w3-padding-small w3-margin-bottom toggle-button" onclick="toggleColor(id)" id="{{ tags }}">{{ popular_tags[tags] }}</button>
+      {% endfor %}
+      <button class="w3-tag w3-round-medium w3-large w3-padding-small w3-margin-bottom toggle-button" onclick="custom_tag()" id="nuBh3hb8kL">Create Custom Tag</button>
+    </p>
+  </div>
+<div id="style_new_post">
 <form id="submit_new_post_form" action="/new_post" method="post" enctype="multipart/form-data">
     <input type='text' value='{{ XSRF_value }}' id='xsrf_token' name="xsrf_token" hidden>
+    <input type='text' value='' id='tags_pressed' name="tags_pressed" hidden>
     {% if title_error %}
-    <p style="color: red;" id="need_title"></p>
+      <p style="color: red;" id="need_title">Enter a Title</p>
     {% endif %}
     <input type="text" id="new_post_title" placeholder="Post Title" name="new_post_title">
     {% if desc_error %}
-    <p style="color: red;" id="need_desc"></p>
+      <p style="color: red;" id="need_desc">Enter a description</p>
     {% endif %}
     <textarea id="new_post_description" placeholder="Post Description" name="new_post_description"></textarea>
     {% if pic_error %}
-    <p style="color: red;" id="need_pic"></p>
+      <p style="color: red;" id="need_pic">Attach a picture of your wonderful art</p>
     {% endif %}
     Attach an Image:
-    <input type="file" id="post_picture" name="file" name="post_picture">
-    <input type="submit" value="Submit" onclick="make_new_post()">
+    <input type="file" id="post_picture" name="file" name="post_picture"><br>
+    <input type="submit" value="Submit" id="submit_form"><br><br>
     <button id="the_close_button" onclick="new_post_form_close()">Close</button>
 </form>
-
-<div id="header1">
-    <div id="w31">
-      <div id="w311" onclick="w3_open()">☰</div>
-      <div id="w312">
-        {% if Username_status == False %}
-        <p id="tl-username">{{Username}}</p></div>
-        <button onclick='serve_login_page()' class="all_buttons">Log In</button></div>
-        {% else %}
-        <p id="tl-username">{{Username}}</p></div>
-        {% endif %}
-      <div id="w313" onclick="return_home()">Hobbied</div>
-      <div style="width: fit-content;">
-      <input type="text" placeholder="Search.." id="search_bar">
-      <div style="float: inline-end;"><button onclick="search_database()" class="all_buttons">Go!</button></div>
-      </div>
-    </div>
-  </div>
+</div>
+<script>
+  // Script to open and close sidebar
+  function w3_open() {
+    document.getElementById("mySidebar").style.display = "block";
+  }
+   
+  function w3_close() {
+    document.getElementById("mySidebar").style.display = "none";
+  }
+  
+  function w3_close_account() {
+    document.getElementById("mySidebar").style.display = "none";
+    window.location.href = "/account";
+  }
+  
+  function w3_close_about() {
+    document.getElementById("mySidebar").style.display = "none";
+    window.location.href = "/about";
+  }
+  
+  function return_home() {
+    window.location.href = "/";
+  }
+  
+  function new_post_open() {
+    document.getElementById("new_post_title").innerHTML = "";
+    document.getElementById("new_post_description").innerHTML = "";
+    document.getElementById("post_picture").value = "";
+    document.getElementById("new_post_form").style.display = "block";
+    document.getElementById("new_post").style.display = "none";
+  }
+  
+  function new_post_navigate() {
+    window.location.href = "/new_post";
+  }
+  </script>
+<script src="../static/js/functions.js"></script>
+</body>
+</html>
