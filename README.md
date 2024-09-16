@@ -1,4 +1,4 @@
-#Hobbied!
+# Hobbied!
 This is THE website to share all your hobbies and creations with the world.
 -Create a post and let the world know about your creations
 -Like, Dislike and Comment on the post and express yourself
